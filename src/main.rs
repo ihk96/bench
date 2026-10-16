@@ -1,20 +1,14 @@
-use ratatui::{
-    crossterm::event::{self}
-};
-use vllm_bench::app::App;
+use crate::app::App;
 
+pub mod app;
+pub mod event;
+pub mod ui;
 
-fn main() -> std::io::Result<()> {
-    ratatui::run(|terminal| {
-        let mut app = App::new();
-
-        loop {
-            terminal.draw(|frame| app.render(frame))?;
-
-            let event = event::read()?;
-            if !app.handle_event(&event) {
-                break Ok(());
-            }
-        }
-    })
+#[tokio::main]
+async fn main() -> color_eyre::Result<()> {
+    color_eyre::install()?;
+    let terminal = ratatui::init();
+    let result = App::new().run(terminal).await;
+    ratatui::restore();
+    result
 }
