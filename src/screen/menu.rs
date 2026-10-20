@@ -1,11 +1,12 @@
 use crossterm::event::{KeyCode, KeyEvent};
-use ratatui::{buffer::Buffer, layout::Rect, style::Modifier, widgets::{List, ListState, StatefulWidget}};
-use crate::{app::App, event::AppEvent, screen::HandledEvent};
+use ratatui::{Frame, buffer::Buffer, layout::Rect, style::Modifier, widgets::{List, ListState, StatefulWidget}};
+use crate::{event::AppEvent, screen::{HandledEvent, Screen, counter::CounterScreen, job::JobScreen, settings::SettingsScreen}, state::AppState};
 
 
-const MENU_ITEMS: [(&str, AppEvent); 3] = [
-    ("Counter", AppEvent::OpenCounter), 
-    ("Job", AppEvent::OpenJob),
+const MENU_ITEMS: [(&str, AppEvent); 4] = [
+    ("Counter", AppEvent::PushScreen(|| Box::new(CounterScreen))), 
+    ("Job", AppEvent::PushScreen(|| Box::new(JobScreen))),
+    ("Settings", AppEvent::PushScreen(|| Box::new(SettingsScreen::default()))),
     ("Quit", AppEvent::Quit),
 ];
 
@@ -14,22 +15,25 @@ pub struct MenuScreen {
     selected: usize,
 }
 
-impl MenuScreen {
-    pub fn new() -> Self {
+impl Default for MenuScreen {
+    fn default() -> Self {
         Self { selected: 0 }
     }
+}
 
-    pub fn render(&self, area: Rect, buf: &mut Buffer, _app: &App) {
+impl Screen for MenuScreen {
+
+    fn render(&self, frame: &mut Frame, area: Rect, _state: &AppState) {
         let list = List::new(MENU_ITEMS.iter().map(|(name, _)| *name))
             .highlight_symbol("> ")
             .highlight_style(Modifier::REVERSED);
 
         let mut list_state = ListState::default().with_selected(Some(self.selected));
 
-        StatefulWidget::render(list, area, buf, &mut list_state);
+        frame.render_stateful_widget(list, area, &mut list_state);
     }
 
-    pub fn handle_key(&mut self, key: KeyEvent) -> HandledEvent {
+    fn handle_key(&mut self, key: KeyEvent, _state: &mut AppState) -> HandledEvent {
         match key.code {
             KeyCode::Up => {
                 self.selected = if self.selected == 0 {
@@ -48,7 +52,7 @@ impl MenuScreen {
                 HandledEvent::Consumed
             },
             KeyCode::Enter => {
-                HandledEvent::Event(MENU_ITEMS[self.selected].1.clone())
+                return HandledEvent::Event(MENU_ITEMS[self.selected].1.clone());
             },
             _ => HandledEvent::Ignored,
         }

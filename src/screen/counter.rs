@@ -1,13 +1,13 @@
 use crossterm::event::{KeyCode, KeyEvent};
 use ratatui::{
-    buffer::Buffer, layout::{Alignment, Rect}, style::{Color,Stylize}, widgets::{Block, BorderType, Paragraph, Widget}};
-use crate::{app::App, event::AppEvent, screen::HandledEvent};
+    Frame, layout::{Alignment, Rect}, style::{Color,Stylize}, widgets::{Block, BorderType, Paragraph, Widget}};
+use crate::{event::AppEvent, screen::{HandledEvent, Screen}, state::AppState};
 
 #[derive(Debug)]
 pub struct CounterScreen;
 
-impl CounterScreen {
-    pub fn render(&self, area: Rect, buf: &mut Buffer, app: &App) {
+impl Screen for CounterScreen {
+    fn render(&self, frame: &mut Frame, area: Rect, state: &AppState) {
         let block = Block::bordered()
             .title("llm-instance-bench")
             .title_alignment(Alignment::Center)
@@ -19,7 +19,7 @@ impl CounterScreen {
                 Press `Ctrl-C` or `q` to stop running.\n\
                 Press left and right to increment and decrement the counter respectively.\n\
                 Counter: {}",
-            app.counter
+            state.counter.counter
         );
 
         let paragraph = Paragraph::new(text)
@@ -28,13 +28,19 @@ impl CounterScreen {
             .bg(Color::Black)
             .centered();
 
-        paragraph.render(area, buf);
+        frame.render_widget(paragraph, area);
     }
-    pub fn handle_key(&mut self, key: KeyEvent) -> HandledEvent {
+    fn handle_key(&mut self, key: KeyEvent, state: &mut AppState) -> HandledEvent {
         match key.code {
-            KeyCode::Right => HandledEvent::Event(AppEvent::Increment),
-            KeyCode::Left => HandledEvent::Event(AppEvent::Decrement),
-            KeyCode::Esc => HandledEvent::Event(AppEvent::OpenMenu),
+            KeyCode::Right => {
+                state.counter.increment();
+                HandledEvent::Consumed
+            },
+            KeyCode::Left => {
+                state.counter.decrement();
+                HandledEvent::Consumed
+            },
+            KeyCode::Esc => HandledEvent::Event(AppEvent::PopScreen),
             _ => HandledEvent::Ignored,
         }
     }
