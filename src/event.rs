@@ -37,6 +37,11 @@ pub enum AppEvent {
     Decrement,
     /// Quit the application.
     Quit,
+    OpenMenu,
+    OpenCounter,
+    StartJob,
+    JobDone(std::time::Duration),
+    OpenJob,
 }
 
 /// Terminal event handler.
@@ -81,6 +86,10 @@ impl EventHandler {
         // Ignore the result as the reciever cannot be dropped while this struct still has a
         // reference to it
         let _ = self.sender.send(Event::App(app_event));
+    }
+    
+    pub fn clone_sender(&self) -> mpsc::UnboundedSender<Event> {
+        self.sender.clone()
     }
 }
 
