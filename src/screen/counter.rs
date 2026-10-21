@@ -7,7 +7,7 @@ use crate::{event::AppEvent, screen::{HandledEvent, Screen}, state::AppState};
 pub struct CounterScreen;
 
 impl Screen for CounterScreen {
-    fn render(&self, frame: &mut Frame, area: Rect, state: &AppState) {
+    fn render(&self, frame: &mut Frame, area: Rect, state: &mut AppState) {
         let block = Block::bordered()
             .title("llm-instance-bench")
             .title_alignment(Alignment::Center)

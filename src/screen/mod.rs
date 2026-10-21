@@ -11,7 +11,7 @@ pub mod settings;
 
 pub trait Screen: std::fmt::Debug {
     fn handle_key(&mut self, key: KeyEvent, state: &mut AppState) -> HandledEvent;
-    fn render(&self, frame: &mut Frame, area: Rect, state: &AppState);
+    fn render(&self, frame: &mut Frame, area: Rect, state: &mut AppState);
 }
 
 pub enum HandledEvent {

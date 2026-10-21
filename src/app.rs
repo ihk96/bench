@@ -55,10 +55,10 @@ impl App {
         Ok(())
     }
 
-    fn render(&self, frame: &mut Frame) {
+    fn render(&mut self, frame: &mut Frame) {
         if let Some(screen) = self.screen_stack.last() {
             let area = frame.area();
-            screen.render(frame, area, &self.state);
+            screen.render(frame, area, &mut self.state);
         }
     }
 
@@ -89,7 +89,7 @@ impl App {
     /// The tick event is where you can update the state of your application with any logic that
     /// needs to be updated at a fixed frame rate. E.g. polling a server, updating an animation.
     pub fn tick(&mut self) {
-        self.state.job.tick();
+        // self.state.job.tick();
     }
 
     /// Set running to false to quit the application.

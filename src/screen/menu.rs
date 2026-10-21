@@ -23,7 +23,7 @@ impl Default for MenuScreen {
 
 impl Screen for MenuScreen {
 
-    fn render(&self, frame: &mut Frame, area: Rect, _state: &AppState) {
+    fn render(&self, frame: &mut Frame, area: Rect, _state: &mut AppState) {
         let list = List::new(MENU_ITEMS.iter().map(|(name, _)| *name))
             .highlight_symbol("> ")
             .highlight_style(Modifier::REVERSED);
